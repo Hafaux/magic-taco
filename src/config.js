@@ -1,3 +1,6 @@
 export default {
-  tacoPos: { x: 0, y: 0 },
+  canvasPos: {
+    left: 'calc(50% - 150px)',
+    top: 'calc(50% - 150px)',
+  },
 };

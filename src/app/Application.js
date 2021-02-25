@@ -36,7 +36,7 @@ export default class Application extends EventEmitter {
    */
   async init() {
     // Initiate classes and wait for async operations here.
-    this.data.tacoScene = new TacoScene(this.container, this.config.tacoPos);
+    this.data.tacoScene = new TacoScene(this.container, this.config.canvasPos);
 
     this.emit(Application.events.APP_READY);
   }

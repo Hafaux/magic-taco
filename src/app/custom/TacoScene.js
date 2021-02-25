@@ -22,16 +22,17 @@ import Taco from './Taco';
 export default class TacoScene {
   /**
    * @param {HTMLCanvasElement} canvas html canvas element
-   * @param {Object} tacoPos taco position
+   * @param {Object} canvasPos taco position
    */
-  constructor(canvas, tacoPos = { x: 0, y: 0 }) {
+  constructor(canvas, canvasPos = { left: '0px', top: '0px' }) {
     this.container = canvas;
+    this.canvasCenter = null;
 
-    this.tacoPos = tacoPos;
+    this.canvasPos = canvasPos;
 
     this.engine = new Engine(this.container, true);
     this.scene = new Scene(this.engine);
-    this.camera = new UniversalCamera('cam', new Vector3(0, 0.6, -8), this.scene);
+    this.camera = new UniversalCamera('cam', new Vector3(0, 0.6, -3.5), this.scene);
 
     this.lights = [];
     this.taco = null;
@@ -40,9 +41,22 @@ export default class TacoScene {
     this.advancedTexture = GUI.AdvancedDynamicTexture.CreateFullscreenUI('label', false);
     this.label = null;
     this.waves = null;
-    this.rays = new RayEffect(this.tacoPos);
+    this.rays = new RayEffect();
 
     this._init();
+  }
+
+  /**
+   * Gets the center coord of the canvas
+   * @private
+   */
+  _getCanvasCenter() {
+    const canvasRect = this.container.getBoundingClientRect();
+
+    return {
+      x: canvasRect.x + (canvasRect.width / 2),
+      y: canvasRect.y + (canvasRect.height / 2),
+    };
   }
 
   /**
@@ -74,27 +88,31 @@ export default class TacoScene {
    * @private
    */
   _appendCanvas() {
-    this.container.style.width = '100vw';
-    this.container.style.height = '100vh';
+    this.container.style.width = '300px';
+    this.container.style.height = '300px';
     this.container.id = 'gameCanvas';
 
+    this.container.style.position = 'absolute';
+    this.container.style.outline = 'none';
+    this.container.style.left = this.canvasPos.left;
+    this.container.style.top = this.canvasPos.top;
+
     document.body.appendChild(this.container);
+
+    this.canvasCenter = this._getCanvasCenter();
   }
 
   /**
    * Updates the direction where the sound is coming from relative to the taco.
    * @private
    */
-  _updateSoundDirection() {
-    const pickResult = this.scene.pick(this.scene.pointerX, this.scene.pointerY);
-    const ray = pickResult.ray;
-    const distance = 30;
-    const pos = {
-      x: ray.origin.x + (ray.direction.x * distance),
-      y: ray.origin.y + (ray.direction.y * distance),
+  _updateSoundDirection(event) {
+    const relativePos = {
+      x: (event.x - this.canvasCenter.x) / 15,
+      y: -(event.y - this.canvasCenter.y) / 15,
     };
 
-    this.scene.audioListenerPositionProvider = () => new Vector3(pos.x, pos.y, -3);
+    this.scene.audioListenerPositionProvider = () => new Vector3(relativePos.x, relativePos.y, -3);
   }
 
   /**
@@ -115,7 +133,7 @@ export default class TacoScene {
    * @returns {Promise}
    */
   async _addTaco() {
-    this.taco = new Taco(this.scene, this.tacoPos);
+    this.taco = new Taco(this.scene);
 
     await this.taco.loadingPromise;
 
@@ -215,6 +233,10 @@ export default class TacoScene {
 
     gsap.to(this.label.mainLabel, {
       alpha: 0,
+      onComplete: () => {
+        this.engine.stopRenderLoop();
+        document.body.removeChild(this.container);
+      },
     });
   }
 
