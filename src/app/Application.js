@@ -1,5 +1,8 @@
 import config from '../config';
 import EventEmitter from 'eventemitter3';
+import '@babylonjs/inspector';
+import '@babylonjs/loaders/glTF';
+import TacoScene from './custom/TacoScene';
 
 const EVENTS = {
   APP_READY: 'app_ready',
@@ -16,6 +19,8 @@ export default class Application extends EventEmitter {
     this.config = config;
     this.data = { };
 
+    this.container = document.createElement('canvas');
+
     this.init();
   }
 
@@ -31,6 +36,7 @@ export default class Application extends EventEmitter {
    */
   async init() {
     // Initiate classes and wait for async operations here.
+    this.data.tacoScene = new TacoScene(this.container, this.config.tacoPos);
 
     this.emit(Application.events.APP_READY);
   }

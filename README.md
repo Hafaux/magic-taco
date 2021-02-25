@@ -1,5 +1,11 @@
-# ⚙ GSAP Boilerplate
-This project is used as a boilerplate for tasks in the "GSAP" course in Booost. It initializes a base application with a webpack dev server.
+# 🌮 Magic Taco
+![](https://faust.s-ul.eu/ueEOGRJ2)
+
+The 'Magic Taco' Bounty Pass task at www.booost.bg.
+
+Represents an interactive 3D taco with particle effects and spatial audio. Implemented using [babylon.js](https://www.babylonjs.com/) and [gsap](https://greensock.com/gsap/).
+
+[<img src="https://img.shields.io/badge/ooo-zdr-yellow">](https://booost.bg/)
 
 Includes:
 * 📦 Bundling via Webpack
