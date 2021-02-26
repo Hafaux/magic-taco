@@ -5,7 +5,6 @@ import {
   UniversalCamera,
   Vector3,
   DirectionalLight,
-  Sound,
 } from '@babylonjs/core';
 import * as GUI from '@babylonjs/gui/2D';
 import gsap from 'gsap';
@@ -15,6 +14,7 @@ import Label from './Label';
 import Waves from './Waves';
 import Particles from './Particles';
 import Taco from './Taco';
+import { Howl } from 'howler';
 
 /**
  * Class representing the whole scene containing the taco.
@@ -108,11 +108,13 @@ export default class TacoScene {
    */
   _updateSoundDirection(event) {
     const relativePos = {
-      x: (event.x - this.canvasCenter.x) / 15,
-      y: -(event.y - this.canvasCenter.y) / 15,
+      x: -(event.x - this.canvasCenter.x) / window.innerWidth,
+      y: (event.y - this.canvasCenter.y) / window.innerWidth,
     };
+    const volume = 1 - (Math.abs(relativePos.x) + Math.abs(relativePos.y));
 
-    this.scene.audioListenerPositionProvider = () => new Vector3(relativePos.x, relativePos.y, -3);
+    this.sound.volume(volume * volume);
+    this.sound.pos(relativePos.x, relativePos.y, -0.5, this.sound._getSoundIds()[0]);
   }
 
   /**
@@ -156,15 +158,7 @@ export default class TacoScene {
    * @private
    */
   _addSound() {
-    this.sound = new Sound('magic', magicSound, this.scene, null, {
-      loop: true,
-      autoplay: true,
-      spatialSound: true,
-      distanceModel: 'exponential',
-      rolloffFactor: 1,
-    });
-
-    this.sound.attachToMesh(this.taco.mesh.parent);
+    this.sound = new Howl({ src: magicSound, loop: true, autoplay: true });
   }
 
   /**
@@ -211,9 +205,15 @@ export default class TacoScene {
     if (this.sound) {
       const dummyObj = { volume: 1 };
 
-      gsap.to(dummyObj, { volume: 0, onUpdate: () => {
-        this.sound.setVolume(dummyObj.volume);
-      } });
+      gsap.to(dummyObj, {
+        volume: 0,
+        onUpdate: () => {
+          this.sound.volume(dummyObj.volume);
+        },
+        onComplete: () => {
+          this.sound.stop();
+        },
+      });
     }
 
     gsap.to(tacoMesh, {
