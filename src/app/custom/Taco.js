@@ -1,5 +1,7 @@
 import { SceneLoader, Vector3, Matrix, Mesh } from '@babylonjs/core';
+import gsap from 'gsap/gsap-core';
 import tacoModel from '../../assets/taco.glb';
+import config from '../../config';
 
 /**
  * Class representing the taco.
@@ -13,6 +15,7 @@ export default class Taco {
     this.scene = scene;
     this.tacoPos = { x, y };
     this.mesh = null;
+    this.rotationTween = null;
     this.loadingPromise = this._loadTaco();
   }
 
@@ -35,6 +38,16 @@ export default class Taco {
     this.mesh.rotation = new Vector3(0, 0, 0);
 
     this._setTacoPosition(this.tacoPos.x, this.tacoPos.y);
+
+    const dummyObj = { dummyVal: 0 };
+
+    this.rotationTween = gsap.to(dummyObj, {
+      dummyVal: 1,
+      repeat: -1,
+      onUpdate: () => {
+        this.mesh.parent.rotation.y += config.rotationSpeed;
+      },
+    });
   }
 
   /**

@@ -124,9 +124,11 @@ export default class TacoScene {
   _addLights() {
     this.lights = [
       new DirectionalLight('dir01', new Vector3(0.5, -1, 2), this.scene),
+      new DirectionalLight('dir02', new Vector3(-1.5, 1, 2), this.scene),
     ];
 
     this.lights[0].intensity = 15;
+    this.lights[1].intensity = 5;
   }
 
   /**
@@ -171,6 +173,8 @@ export default class TacoScene {
       const dummyObj = {
         shakeIntensity: 0,
       };
+
+      if (this.taco.rotationTween) this.taco.rotationTween.pause();
 
       gsap.to(dummyObj, { shakeIntensity: 0.05, duration: 3 });
 
@@ -246,6 +250,8 @@ export default class TacoScene {
    */
   _onPointerUp() {
     if (this.bgTween) this.bgTween.kill();
+    if (this.taco.rotationTween) this.taco.rotationTween.play();
+
     this.bgTween = gsap.to(this.label.labelBg, {
       width: '0%',
       duration: 0.2,

@@ -27,14 +27,20 @@ export default class Label {
     this.mainLabel.width = '220px';
     this.mainLabel.height = '35px';
     this.mainLabel.color = yellowColor;
-    this.mainLabel.cornerRadius = 20;
+    this.mainLabel.cornerRadius = 50;
 
     const labelText = new GUI.TextBlock();
 
     labelText.text = 'PRESS AND HOLD';
     labelText.color = yellowColor;
-    this.mainLabel.addControl(labelText);
+    const style = this.advancedTexture.createStyle();
 
+    style.fontSize = 16;
+    style.fontWeight = 'bold';
+
+    labelText.style = style;
+
+    this.mainLabel.addControl(labelText);
     this.advancedTexture.addControl(this.mainLabel);
 
     this.labelBg = new GUI.Rectangle('');
